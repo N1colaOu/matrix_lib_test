@@ -60,7 +60,6 @@ template<typename T>
 bool Matrix<T>::empty() const{
     return data == nullptr && num_cols == 0 && num_rows == 0;
 }
-
 template<typename T>
 size_t Matrix<T>::get_rows() const{
     return num_rows;
