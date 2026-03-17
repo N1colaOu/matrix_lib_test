@@ -165,8 +165,8 @@ void Matrix<T>::print() const {
     }
 }
 
-// template<typename T>
-// void Matrix<T>::fill_up(std::string filename){
+template<typename T>
+class Spline{
 
-// }
+};
 

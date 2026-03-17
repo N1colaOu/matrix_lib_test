@@ -43,3 +43,14 @@ std::vector<T> lagr_plnm(std::vector<T> x, std::vector<T> y){
     //lin_sys.print();
     return lin_sys.get_col_val(n);
 }
+
+template<typename T>
+Matrix<T> n_spline(std::vector<T> x, std::vector<T> y, size_t n){
+    //wip
+}
+
+template<typename T>
+Matrix<T> cubic_spline(std::vector<T> x, std::vector<T> y){
+    n_spline(x, y, 3);
+    //wip
+}
