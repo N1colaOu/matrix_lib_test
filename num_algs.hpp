@@ -45,8 +45,12 @@ std::vector<T> lagr_plnm(std::vector<T> x, std::vector<T> y){
 }
 
 template<typename T>
-Matrix<T> n_spline(std::vector<T> x, std::vector<T> y, size_t n){
-    //wip
+Matrix<T> n_spline(std::vector<T> x, std::vector<T> y, size_t m){
+    size_t n = x.size();
+    assert(n == y.size());
+    n--; // we have 1 less intervals than points
+    m++; // we have 1 more coeffs than value of highest power of x
+    std::vector<Spline> sing_splines;
 }
 
 template<typename T>
