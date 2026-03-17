@@ -50,6 +50,15 @@ bool isSquare(const Matrix<T>& m){
     return m.get_cols() == m.get_rows();
 }
 template<typename T>
+bool isSingular(Matrix<T>& m){
+    if(isSquare(m)){
+        return det(m) == 0.0;
+    }
+    else{
+        return true; //wip
+    }
+}
+template<typename T>
 Matrix<T> transpon(Matrix<T>& m){
     //wip
 }
@@ -110,6 +119,21 @@ void switchRows(Matrix<T>& m, size_t row1, size_t row2){
     } 
 }
 
+// template<typename T>
+// std::vector<T> lin_sys_gj(Matrix<T> m, const std::vector<T>& b){
+//     assert(!isSingular(m));
+//     assert(b.size() == m.get_rows());
+//     m.add_col(b);
+//     m = *gj_triangle(m);
+//     for (size_t i = 0; i < m.get_rows()-1; i++)
+//     {
+//         m.rem_col(i);
+//     }
+//     std::vector<T> x (m.get_data());
+//     delete m;
+//     return x;
+// }
+
 template<typename T>
 Matrix<T>* gj_triangle(Matrix<T>& m){
     assert(m.get_cols() >= m.get_rows()); //if false, then matrix is overdefined and should run with only a trimmed version (aka less equs)
@@ -123,9 +147,7 @@ Matrix<T>* gj_triangle(Matrix<T>& m){
                 std::cout << "Singular matrix!\n";//if it doesnt exist -> no sol
                 assert(false);
             }
-            else{
-                switchRows(m, i, pivotPoint);//if it does we swap
-            }
+            switchRows(m, i, pivotPoint);
         }
         coef = m.at({i, i});
         m.at({i, i}) = 1.0;

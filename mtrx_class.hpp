@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <fstream>
 
 struct Coordinate{
     size_t row;
@@ -23,28 +24,51 @@ class Matrix{
 
     public:
     Matrix();
+    Matrix(std::string);
     Matrix(size_t, size_t);
     Matrix(const Matrix&);
     virtual ~Matrix();
     
     bool empty() const;
     
+    T* get_data() const;
     size_t get_rows() const;
+    std::vector<T> get_row_val(size_t) const;
     size_t get_cols() const;
+    std::vector<T> get_col_val(size_t) const;
     void add_col(const std::vector<T>&);
     void rem_col(const size_t);
-    T* get_data() const;
     
     T& at(const Coordinate&);
-    void print() const;
-    void fill_up();
-    
+    void print() const;    
 };
 
 template<typename T>
 Matrix<T>::Matrix() : num_rows(0), num_cols(0), data(nullptr) {}
 template<typename T>
-Matrix<T>::Matrix(size_t r, size_t c) : num_rows(r), num_cols(c), data(new T[r*c]) {}
+Matrix<T>::Matrix(std::string filename){
+    std::ifstream input(filename);
+    input >> num_rows >> num_cols;
+    data = new T[num_cols*num_rows];
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        for (size_t j = 0; j < num_cols; j++)
+        {
+            input >> data[i*num_cols + j];
+        }  
+    }
+    input.close();
+}
+template<typename T>
+Matrix<T>::Matrix(size_t r, size_t c) : num_rows(r), num_cols(c), data(new T[r*c]) {
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        for (size_t j = 0; j < num_cols; j++)
+        {
+            data[i*num_cols+j] = 0;
+        }
+    }
+}
 template<typename T>
 Matrix<T>::Matrix(const Matrix &m) : num_rows(m.get_rows()), num_cols(m.get_cols()), data(m.get_data()) {}
 template<typename T>
@@ -55,7 +79,6 @@ size_t Matrix<T>::toIndex(const Coordinate& coord) const{
     return coord.row*(num_cols) + coord.col;
 }
 
-
 template<typename T>
 bool Matrix<T>::empty() const{
     return data == nullptr && num_cols == 0 && num_rows == 0;
@@ -65,8 +88,28 @@ size_t Matrix<T>::get_rows() const{
     return num_rows;
 }
 template<typename T>
+std::vector<T> Matrix<T>::get_row_val(size_t idx) const{
+    std::vector<T> row;
+    row.reserve(num_cols);
+    for (size_t i = 0; i < num_cols; i++)
+    {
+        row.push_back(data[idx*num_cols + i]);
+    }
+    return row;
+}
+template<typename T>
 size_t Matrix<T>::get_cols() const{
     return num_cols;
+}
+template<typename T>
+std::vector<T> Matrix<T>::get_col_val(size_t idx) const{
+    std::vector<T> col;
+    col.reserve(num_rows);
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        col.push_back(data[idx + i*num_cols]);
+    }
+    return col;
 }
 template<typename T>
 T* Matrix<T>::get_data() const{
@@ -122,16 +165,8 @@ void Matrix<T>::print() const {
     }
 }
 
-template<typename T>
-void Matrix<T>::fill_up(){
-    std::cout << "Enter your " << num_rows << "x" << num_cols << " matrix!\n";
-    for (size_t i = 0; i < num_rows; i++)
-    {
-        std::cout << "Enter row " << i << ": ";
-        for (size_t j = 0; j < num_cols; j++)
-        {
-            std::cin >> data[i*num_cols + j];
-        }
-    }
-}
+// template<typename T>
+// void Matrix<T>::fill_up(std::string filename){
+
+// }
 
