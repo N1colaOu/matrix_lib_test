@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <cassert>
-#include "mtrx_class.hpp"
-#include "mtrx_funcs.hpp"
+#include "classes.h"
+#include "functions.h"
 #include <cmath>
 
 template<typename T>
@@ -50,7 +50,7 @@ Matrix<T> n_spline(std::vector<T> x, std::vector<T> y, size_t m){
     assert(n == y.size());
     n--; // we have 1 less intervals than points
     m++; // we have 1 more coeffs than value of highest power of x
-    std::vector<Spline> sing_splines;
+    //std::vector<Spline> sing_splines;
 }
 
 template<typename T>

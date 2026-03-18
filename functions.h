@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include "mtrx_class.hpp"
+#include "classes.h"
 
 template<typename T>
 T det(Matrix<T>& m){

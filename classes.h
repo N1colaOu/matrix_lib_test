@@ -165,8 +165,66 @@ void Matrix<T>::print() const {
     }
 }
 
+
 template<typename T>
 class Spline{
+    T a;
+    T b;
+    T c;
+    T d;
+    T x;
+    public:
+    Spline();
+    Spline(T, T, T, T, T);
+    ~Spline();
+
+    T get_zero() const;
+    T get_first() const;
+    T get_second() const;
+    T get_third() const;
+    T get_x() const;
+    T get_overall() const;
+    T get_1_derv() const;
+    T get_2_derv() const;
+
 
 };
 
+template<typename T>
+Spline<T>::Spline() = default;
+template<typename T>
+Spline<T>::Spline(T _a, T _b, T _c, T _d, T _x) : a(_a), b(_b), c(_c), d(_d), x(_x) {}
+template<typename T>
+Spline<T>::~Spline() = default;
+template<typename T>
+T Spline<T>::get_zero() const{
+    return a;
+}
+template<typename T>
+T Spline<T>::get_first() const{
+    return b;
+}
+template<typename T>
+T Spline<T>::get_second() const{
+    return c;
+}
+template<typename T>
+T Spline<T>::get_third() const{
+    return d;
+}
+template<typename T>
+T Spline<T>::get_x() const{
+    return x;
+}
+template<typename T>
+T Spline<T>::get_overall() const{
+    return a + b*x + c*x*x + d*x*x*x;
+}
+template<typename T>
+T Spline<T>::get_1_derv() const{
+    return b + 2*c*x + 3*d*x*x;
+}
+template<typename T>
+T Spline<T>::get_2_derv() const{
+    return 2*c + 6*d*x;
+}

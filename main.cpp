@@ -1,17 +1,17 @@
 #include <cassert>
 #include <iostream>
-#include "mtrx_class.hpp"
-#include "mtrx_funcs.hpp"
-#include "num_algs.hpp"
+#include "classes.h"
+#include "functions.h"
+#include "num_algs.h"
 #include <cmath>
 #include <vector>
 
 int main(){
     std::cout << std::endl;
-    //Matrix<double> m("input_m.txt");
-    //std::cout << "\nYour matrix: \n";
-    //m.print();
-    //std::cout << "The determinant: " << det(m) << '\n';
+    Matrix<double> m("input_m.txt");
+    std::cout << "\nYour matrix: \n";
+    m.print();
+    std::cout << "The determinant: " << det(m) << '\n';
     //std::cout << "Solved matrix: \n";
     //std::cout << "Solved matrix:\n";
     //gj_triangle(m)->print();

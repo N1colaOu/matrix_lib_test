@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "mtrx_class.hpp"
+#include "classes.h"
 #include <cmath>
 
 Coordinate::Coordinate() = default;
