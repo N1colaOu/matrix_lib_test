@@ -45,16 +45,60 @@ std::vector<T> lagr_plnm(std::vector<T> x, std::vector<T> y){
 }
 
 template<typename T>
-Matrix<T> n_spline(std::vector<T> x, std::vector<T> y, size_t m){
+std::vector<Spline<T>> cubic_nat_splines(std::vector<T> x, std::vector<T> y){
     size_t n = x.size();
-    assert(n == y.size());
-    n--; // we have 1 less intervals than points
-    m++; // we have 1 more coeffs than value of highest power of x
-    //std::vector<Spline> sing_splines;
-}
+    assert(n-- == y.size());    
 
-template<typename T>
-Matrix<T> cubic_spline(std::vector<T> x, std::vector<T> y){
-    n_spline(x, y, 3);
-    //wip
+    std::vector<double> a_s(n+1);
+    for (size_t i = 0; i < n + 1; i++)
+    {
+        a_s.at(i) = ((y.at(i)));
+    }
+    
+    std::vector<double> b_s(n);
+    std::vector<double> d_s(n);
+    std::vector<double> h(n);
+    for (size_t i = 0; i < n; i++)
+    {
+        h.at(i) = (x.at(i+1) - x.at(i));
+    }
+    
+    std::vector<double> alpha(n);
+    for (size_t i = 1; i < n; i++)
+    {
+        alpha.at(i) = (3/h.at(i)*(a_s.at(i+1) - a_s.at(i)) - 3/h.at(i  -1)*(a_s.at(i) - a_s.at(i - 1)));
+    }
+    
+    std::vector<double> c_s(n+1);
+    std::vector<double> z(n+1);
+    std::vector<double> m(n+1);
+    std::vector<double> l(n+1);
+    
+    l.at(0) = 1.0;
+    m.at(0) = 0.0;
+    z.at(0) = 0.0;
+    
+    for (size_t i = 1; i < n; i++)
+    {
+        l.at(i) = (2*(x.at(i+1) - x.at(i-1)) - h.at(i-1)*m.at(i-1));
+        m.at(i) = (h.at(i)/l.at(i));
+        z.at(i) = ((alpha.at(i) - h.at(i-1)*z.at(i-1))/l.at(i));
+    }
+    l.at(n) = 1.0;
+    c_s.at(n) = 0.0;
+    z.at(n) = 0.0;
+    for (int i = n-1; i >= 0; i--)
+    {
+        c_s.at(i) = z.at(i) - m.at(i)*c_s.at(i+1);
+        b_s.at(i) = (a_s.at(i+1)-a_s.at(i))/h.at(i) - h.at(i)*(c_s.at(i+1) + 2*c_s.at(i))/3;
+        d_s.at(i) = (c_s.at(i+1)-c_s.at(i))/(3*h.at(i));
+    }
+    
+    std::vector<Spline<T>> splines;
+    splines.reserve(n);
+    for (size_t i = 0; i < n; i++)
+    {
+        splines.push_back({a_s.at(i), b_s.at(i), c_s.at(i), d_s.at(i), x.at(i)});
+    }
+    return splines;
 }

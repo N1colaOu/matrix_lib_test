@@ -8,10 +8,10 @@
 
 int main(){
     std::cout << std::endl;
-    Matrix<double> m("input_m.txt");
-    std::cout << "\nYour matrix: \n";
-    m.print();
-    std::cout << "The determinant: " << det(m) << '\n';
+    //Matrix<double> m("input_m.txt");
+    //std::cout << "\nYour matrix: \n";
+    //m.print();
+    //std::cout << "The determinant: " << det(m) << '\n';
     //std::cout << "Solved matrix: \n";
     //std::cout << "Solved matrix:\n";
     //gj_triangle(m)->print();
@@ -32,5 +32,10 @@ int main(){
     // for(auto c : coeffs){
     //     std::cout << c << " ";
     // }
+
+     std::vector<Spline<double>> coeffs = cubic_nat_splines<double>({1, 1.5, 2.1, 2.9},{1, 0.7, 0, 0.2});
+     for(auto c : coeffs){
+         std::cout << c << '\n';
+     }
     return 0;
 }

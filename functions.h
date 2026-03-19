@@ -168,3 +168,9 @@ Matrix<T>* gj_triangle(Matrix<T>& m){
     }  
     return &m; 
 }
+
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const Spline<T>& s){
+    out << s.get_zero() << " " << s.get_first() << " " << s.get_second() << " " << s.get_third();
+    return out;
+}

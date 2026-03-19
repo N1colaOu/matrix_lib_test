@@ -187,6 +187,11 @@ class Spline{
     T get_1_derv() const;
     T get_2_derv() const;
 
+    void set_zero(T);
+    void set_first(T);
+    void set_second(T);
+    void set_third(T);
+    void set_x(T);
 
 };
 
@@ -227,4 +232,25 @@ T Spline<T>::get_1_derv() const{
 template<typename T>
 T Spline<T>::get_2_derv() const{
     return 2*c + 6*d*x;
+}
+
+template<typename T>
+void Spline<T>::set_zero(T _a){
+    a = _a;
+}
+template<typename T>
+void Spline<T>::set_first(T _b){
+    b = _b;
+}
+template<typename T>
+void Spline<T>::set_second(T _c){
+    c = _c;
+}
+template<typename T>
+void Spline<T>::set_third(T _d){
+    d = _d;
+}
+template<typename T>
+void Spline<T>::set_x(T _x){
+    x = _x;
 }
