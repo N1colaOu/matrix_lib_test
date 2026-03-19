@@ -33,7 +33,7 @@ int main(){
     //     std::cout << c << " ";
     // }
 
-     std::vector<Spline<double>> coeffs = cubic_nat_splines<double>({1, 1.5, 2.1, 2.9},{1, 0.7, 0, 0.2});
+     std::vector<Spline> coeffs = cubic_nat_splines({1, 1.5, 2.1, 2.9},{1, 0.7, 0, 0.2});
      for(auto c : coeffs){
          std::cout << c << '\n';
      }
