@@ -42,7 +42,9 @@ size_t Matrix::toIndex(const Coordinate& coord) const{
     return coord.row*(num_cols) + coord.col;
 }
 
-
+bool Matrix::isSquare() const{
+    return num_cols == num_rows;
+}
 bool Matrix::empty() const{
     return data == nullptr && num_cols == 0 && num_rows == 0;
 }
@@ -115,6 +117,9 @@ void Matrix::rem_col(const size_t idx){
 double& Matrix::at(const Coordinate& coord){
     return data[toIndex(coord)];
 }
+double Matrix::at(const Coordinate& coord) const{
+    return data[toIndex(coord)];
+}
 
 
 void Matrix::print() const {
@@ -128,63 +133,122 @@ void Matrix::print() const {
     }
 }
 
+Matrix& Matrix::operator=(const Matrix& m){
+    num_rows = m.get_rows();
+    num_cols = m.get_cols();
+    data = m.get_data();
+    return *this;
+}
+// Matrix*& Matrix::operator=(const Matrix*& m){
+//     num_rows = m->get_rows();
+//     num_cols = m->get_cols();
+//     data = m->get_data();
+//     return this;
+// }
+
 Spline::Spline() = default;
-
 Spline::Spline(double _a, double _b, double _c, double _d, double _x) : a(_a), b(_b), c(_c), d(_d), x(_x) {}
-
 Spline::~Spline() = default;
+double Spline::get_zero() const{return a;}
+double Spline::get_first() const{return b;}
+double Spline::get_second() const{return c;}
+double Spline::get_third() const{return d;}
+double Spline::get_x() const{return x;}
 
-double Spline::get_zero() const{
-    return a;
+Vector::Vector() : Matrix(0, 1){}
+Vector::Vector(std::string filename) : Matrix(filename){}
+Vector::Vector(size_t r) : Matrix(r, 1){}
+Vector::Vector(const Vector& vctr) : Matrix(vctr.get_rows(), 1){data = vctr.get_data();}
+Vector::Vector(const std::vector<double>& vctr) : Matrix(vctr.size(), 1){data = const_cast<double*>(vctr.data());}
+Vector::~Vector() = default;
+double& Vector::at(const Coordinate& c){return data[c.row];}
+double Vector::at(const Coordinate& c) const {return data[c.row];}
+
+namespace{
+    size_t findPivot(Matrix& m, size_t curr_col){
+        double max_el{};
+        size_t max_idx{m.get_rows()};
+        for (size_t i = curr_col; i < m.get_rows(); i++)
+        {
+            if(m.at({i, curr_col}) != 0){
+                if(max_el < m.at({i, curr_col})){
+                    max_el = m.at({i, curr_col});
+                    max_idx = i;
+                }
+            }
+        }
+        return max_idx;
+    }
+    void switchRows(Matrix& m, size_t row1, size_t row2){
+    assert(row1 < m.get_rows() && row2 < m.get_rows());
+    for (size_t j = 0; j < m.get_cols(); j++)
+    {
+        double temp = m.at({row1, j});
+        m.at({row1, j}) = m.at({row2, j});
+        m.at({row2, j}) = temp;
+    } 
+}
 }
 
-double Spline::get_first() const{
-    return b;
-}
+void LinSystem::solve_GJ(){
+    assert(A->isSquare());
+    assert(A->get_data() != nullptr);
+    size_t n = A->get_cols();
 
-double Spline::get_second() const{
-    return c;
+    for (size_t i = 0; i < n; i++)
+    {
+        double coef;
+        if(A->at({i, i}) == 0.0){
+            size_t pivotPoint = findPivot(*A, i);//find the row to pivot with
+            if(pivotPoint >= n){
+                std::cout << "No singular defined solution!\n";//if it doesnt exist -> no sol
+                assert(false);
+            }
+            switchRows(*A, i, pivotPoint);
+        }
+        coef = A->at({i, i});
+        A->at({i, i}) = 1.0;
+        for (size_t j = i+1; j < n; j++)
+        {
+            A->at({i, j}) /= coef; //normalize the row
+        }
+        b->at({i, 0}) /= coef; 
+        
+        for (size_t j = 0; j < n; j++)
+        {
+            if(j==i) continue;
+            coef = A->at({j, i});
+            if(coef == 0.0) continue;
+            for (size_t k = 0; k < n; k++)//can be sped up
+            {
+                A->at({j, k}) -= A->at({i, k})*coef; //nullify the coresponding element and decrement the row    
+            } 
+            b->at({j, 0}) -= b->at({i, 0})*coef;
+        }   
+    } 
+    x = b;
 }
+void LinSystem::solve_LU(){
 
-double Spline::get_third() const{
-    return d;
 }
+void LinSystem::solve_QR(){
 
-double Spline::get_x() const{
+}
+LinSystem::LinSystem() : A(), b(), x(){}
+LinSystem::LinSystem(Matrix* _A, Vector* _b) : A(_A), b(_b){ x = new Vector(_b->get_rows());}
+LinSystem::~LinSystem(){delete A, b, x;}
+Vector* LinSystem::get_solution(const std::string& method){
+    if(method == "gauss_jordan"){
+        solve_GJ();
+    }
+    else if(method == "lu_decomp"){
+        solve_LU(); //wip
+    }
+    else if(method == "qr_decomp"){
+        solve_QR(); //wip
+    }
+    else{
+        std::cout << "Invalid Method Name\n";
+    }    
     return x;
 }
-
-double Spline::get_overall() const{
-    return a + b*x + c*x*x + d*x*x*x;
-}
-
-double Spline::get_1_derv() const{
-    return b + 2*c*x + 3*d*x*x;
-}
-
-double Spline::get_2_derv() const{
-    return 2*c + 6*d*x;
-}
-
-
-void Spline::set_zero(double _a){
-    a = _a;
-}
-
-void Spline::set_first(double _b){
-    b = _b;
-}
-
-void Spline::set_second(double _c){
-    c = _c;
-}
-
-void Spline::set_third(double _d){
-    d = _d;
-}
-
-void Spline::set_x(double _x){
-    x = _x;
-}
-
-

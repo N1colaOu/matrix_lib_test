@@ -36,12 +36,13 @@ std::vector<double> lagr_plnm(std::vector<double> x, std::vector<double> y){
         }
     }
     lin_sys.add_col(y);
-    lin_sys = *gj_triangle(lin_sys);
+    //lin_sys = *gj_triangle(lin_sys);
     return lin_sys.get_col_val(n);
 }
 
 
 std::vector<Spline> cubic_nat_splines(std::vector<double> x, std::vector<double> y){
+    //source: https://en.wikipedia.org/w/index.php?title=Spline_(mathematics)&oldid=288288033#Algorithm_for_computing_natural_cubic_splines
     size_t n = x.size();
     assert(n-- == y.size());    
 

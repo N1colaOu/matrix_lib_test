@@ -7,10 +7,17 @@
 #include <vector>
 
 int main(){
-    std::cout << std::endl;
-    //Matrix<double> m("input_m.txt");
-    //std::cout << "\nYour matrix: \n";
-    //m.print();
+    std::cout << std::endl << '\n';
+    // Matrix* A = new Matrix("input_m.txt");
+    // std::cout << "\nYour matrix: \n";
+    // A->print();
+    // Vector* b = new Vector("input_v.txt");
+    // std::cout << "\nYour vector: \n";
+    // b->print();
+
+    LinSystem lin_sys(new Matrix("input_m.txt"), new Vector("input_v.txt"));
+    std::cout << *lin_sys.get_solution("gauss_jordan");
+
     //std::cout << "The determinant: " << det(m) << '\n';
     //std::cout << "Solved matrix: \n";
     //std::cout << "Solved matrix:\n";
@@ -33,9 +40,9 @@ int main(){
     //     std::cout << c << " ";
     // }
 
-     std::vector<Spline> coeffs = cubic_nat_splines({1, 1.5, 2.1, 2.9},{1, 0.7, 0, 0.2});
-     for(auto c : coeffs){
-         std::cout << c << '\n';
-     }
+    //  std::vector<Spline> coeffs = cubic_nat_splines({1, 1.5, 2.1, 2.9},{1, 0.7, 0, 0.2});
+    //  for(auto c : coeffs){
+    //      std::cout << c << '\n';
+    //  }
     return 0;
 }
