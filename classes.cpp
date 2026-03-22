@@ -9,7 +9,7 @@ Coordinate::~Coordinate() = default;
 
 Matrix::Matrix() : num_rows(0), num_cols(0), data(nullptr) {}
 
-Matrix::Matrix(std::string filename){
+Matrix::Matrix(const std::string& filename){
     std::ifstream input(filename);
     input >> num_rows >> num_cols;
     data = new double[num_cols*num_rows];
@@ -33,9 +33,15 @@ Matrix::Matrix(size_t r, size_t c) : num_rows(r), num_cols(c), data(new double[r
     }
 }
 
-Matrix::Matrix(const Matrix &m) : num_rows(m.get_rows()), num_cols(m.get_cols()), data(m.get_data()) {}
+Matrix::Matrix(const Matrix &m) : num_rows(m.get_rows()), num_cols(m.get_cols()){
+    data = new double[num_cols*num_rows];
+    for (size_t i = 0; i < num_cols*num_rows; i++)
+    {
+        data[i] = m.get_data()[i];
+    }
+}
 
-Matrix::~Matrix() {delete[] data;} 
+Matrix::~Matrix() {if(data != nullptr) delete[] data; } 
 
 
 size_t Matrix::toIndex(const Coordinate& coord) const{
@@ -134,9 +140,14 @@ void Matrix::print() const {
 }
 
 Matrix& Matrix::operator=(const Matrix& m){
+    if(data != nullptr) delete[] data;
     num_rows = m.get_rows();
     num_cols = m.get_cols();
-    data = m.get_data();
+    data = new double[num_cols*num_cols];
+    for (size_t i = 0; i < num_cols*num_rows; i++)
+    {
+        data[i] = m.get_data()[i];
+    }
     return *this;
 }
 // Matrix*& Matrix::operator=(const Matrix*& m){
@@ -155,14 +166,48 @@ double Spline::get_second() const{return c;}
 double Spline::get_third() const{return d;}
 double Spline::get_x() const{return x;}
 
-Vector::Vector() : Matrix(0, 1){}
-Vector::Vector(std::string filename) : Matrix(filename){}
-Vector::Vector(size_t r) : Matrix(r, 1){}
-Vector::Vector(const Vector& vctr) : Matrix(vctr.get_rows(), 1){data = vctr.get_data();}
-Vector::Vector(const std::vector<double>& vctr) : Matrix(vctr.size(), 1){data = const_cast<double*>(vctr.data());}
-Vector::~Vector() = default;
-double& Vector::at(const Coordinate& c){return data[c.row];}
-double Vector::at(const Coordinate& c) const {return data[c.row];}
+Vector::Vector() : rows(0), data(nullptr){}
+Vector::Vector(const std::string& filename){
+    std::ifstream input(filename);
+    input >> rows;
+    data = new double[rows];
+    for (size_t i = 0; i < rows; i++)
+    {
+        input >> data[i];
+    }
+    input.close();
+}
+Vector::Vector(size_t r) : rows(r), data(new double[r]){}
+Vector::Vector(const Vector& vctr) : rows(vctr.get_rows()){
+    if(vctr.get_data() !=  nullptr)
+    data = new double[rows];
+    for (size_t i = 0; i < rows; i++)
+    {
+        data[i] = vctr.get_data()[i];
+    }
+}
+Vector::Vector(const std::vector<double>& vctr) : rows(vctr.size()){data = const_cast<double*>(vctr.data());}
+Vector::~Vector(){delete[] data;}
+double& Vector::at(size_t i){return data[i];}
+double Vector::at(size_t i) const {return data[i];}
+
+size_t Vector::get_rows() const{
+    return rows;
+}
+double* Vector::get_data() const{
+    return data;
+}
+
+Vector& Vector::operator=(const Vector& v){
+    if(data != nullptr) delete[] data;
+    rows = v.get_rows();
+    data = new double[rows];
+    for (size_t i = 0; i < rows; i++)
+    {
+        data[i] = v.get_data()[i];
+    }
+    return *this;
+}
 
 namespace{
     size_t findPivot(Matrix& m, size_t curr_col){
@@ -191,39 +236,39 @@ namespace{
 }
 
 void LinSystem::solve_GJ(){
-    assert(A->isSquare());
-    assert(A->get_data() != nullptr);
-    size_t n = A->get_cols();
+    assert(A.isSquare());
+    assert(A.get_data() != nullptr);
+    size_t n = A.get_cols();
 
     for (size_t i = 0; i < n; i++)
     {
         double coef;
-        if(A->at({i, i}) == 0.0){
-            size_t pivotPoint = findPivot(*A, i);//find the row to pivot with
+        if(A.at({i, i}) == 0.0){
+            size_t pivotPoint = findPivot(A, i);//find the row to pivot with
             if(pivotPoint >= n){
                 std::cout << "No singular defined solution!\n";//if it doesnt exist -> no sol
                 assert(false);
             }
-            switchRows(*A, i, pivotPoint);
+            switchRows(A, i, pivotPoint);
         }
-        coef = A->at({i, i});
-        A->at({i, i}) = 1.0;
+        coef = A.at({i, i});
+        A.at({i, i}) = 1.0;
         for (size_t j = i+1; j < n; j++)
         {
-            A->at({i, j}) /= coef; //normalize the row
+            A.at({i, j}) /= coef; //normalize the row
         }
-        b->at({i, 0}) /= coef; 
+        b.at(i) /= coef; 
         
         for (size_t j = 0; j < n; j++)
         {
             if(j==i) continue;
-            coef = A->at({j, i});
+            coef = A.at({j, i});
             if(coef == 0.0) continue;
             for (size_t k = 0; k < n; k++)//can be sped up
             {
-                A->at({j, k}) -= A->at({i, k})*coef; //nullify the coresponding element and decrement the row    
+                A.at({j, k}) -= A.at({i, k})*coef; //nullify the coresponding element and decrement the row    
             } 
-            b->at({j, 0}) -= b->at({i, 0})*coef;
+            b.at(j) -= b.at(i)*coef;
         }   
     } 
     x = b;
@@ -235,9 +280,9 @@ void LinSystem::solve_QR(){
 
 }
 LinSystem::LinSystem() : A(), b(), x(){}
-LinSystem::LinSystem(Matrix* _A, Vector* _b) : A(_A), b(_b){ x = new Vector(_b->get_rows());}
-LinSystem::~LinSystem(){delete A, b, x;}
-Vector* LinSystem::get_solution(const std::string& method){
+LinSystem::LinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b), x(){}
+LinSystem::~LinSystem(){}
+Vector LinSystem::get_solution(const std::string& method){
     if(method == "gauss_jordan"){
         solve_GJ();
     }

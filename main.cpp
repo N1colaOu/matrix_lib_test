@@ -8,17 +8,17 @@
 
 int main(){
     std::cout << std::endl << '\n';
-    // Matrix* A = new Matrix("input_m.txt");
-    // std::cout << "\nYour matrix: \n";
+    Matrix A("input_m.txt");
+    std::cout << "\nYour matrix: \n" << A << "\n";
     // A->print();
-    // Vector* b = new Vector("input_v.txt");
-    // std::cout << "\nYour vector: \n";
+    Vector b("input_v.txt");
+    std::cout << "\nYour vector: \n" << b << '\n';
     // b->print();
-
-    LinSystem lin_sys(new Matrix("input_m.txt"), new Vector("input_v.txt"));
-    std::cout << *lin_sys.get_solution("gauss_jordan");
-
-    //std::cout << "The determinant: " << det(m) << '\n';
+    LinSystem lin_sys(A, b);
+    Vector x (lin_sys.get_solution("gauss_jordan"));
+    std::cout << x << '\n';
+    
+    //std::cout << "The determinant: " << det(A) << '\n';
     //std::cout << "Solved matrix: \n";
     //std::cout << "Solved matrix:\n";
     //gj_triangle(m)->print();

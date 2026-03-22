@@ -5,7 +5,7 @@
 #include "classes.h"
 
 
-double det(Matrix& m){
+double det(const Matrix& m){
     assert(m.isSquare());
     double res{};
     if(m.get_rows() == 1){
@@ -39,14 +39,10 @@ double det(Matrix& m){
     }
     return res;
 }
-
-bool existInv(Matrix& m){
+bool existInv(const Matrix& m){
     return det(m) != 0;
 }
-
-
-
-bool isSingular(Matrix& m){
+bool isSingular(const Matrix& m){
     if(m.isSquare()){
         return det(m) == 0.0;
     }
@@ -54,17 +50,10 @@ bool isSingular(Matrix& m){
         return true; //wip
     }
 }
-
-Matrix transpon(Matrix& m){
+Matrix transpon(const Matrix& m){
     //wip
     return m;
 }
-
-
-
-
-
-
 
 std::ostream& operator<<(std::ostream& out, const Spline& s){
     out << s.get_zero() << " + " << s.get_first() << "(x-" << s.get_x() <<") + " << s.get_second() << "(x-" << s.get_x() << ")^2 + " << s.get_third() << "(x-" << s.get_x() << ")^3";
@@ -73,7 +62,7 @@ std::ostream& operator<<(std::ostream& out, const Spline& s){
 std::ostream& operator<<(std::ostream& out, const Vector& m){
     for (size_t i = 0; i < m.get_rows(); i++)
     {
-        out << m.at({i, 0}) << '\n';       
+        out << m.at(i) << '\n';       
     }
     return out;
 }

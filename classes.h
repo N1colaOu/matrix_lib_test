@@ -5,7 +5,8 @@
 #include <vector>
 #include <fstream>
 
-struct Coordinate{
+class Coordinate{
+    public:
     size_t row;
     size_t col;    
     Coordinate();
@@ -26,7 +27,7 @@ class Matrix{
     void rem_col(const size_t);
     
     Matrix();
-    Matrix(std::string);
+    Matrix(const std::string&);
     Matrix(size_t, size_t);
     Matrix(const Matrix&);
     virtual ~Matrix();
@@ -48,18 +49,23 @@ class Matrix{
     //Matrix*& operator=(const Matrix*&);
 };
 
-class Vector : public Matrix{
+class Vector{
+    size_t rows;
+    double* data;
     public:
     Vector();
-    Vector(std::string);
+    Vector(const std::string&);
     Vector(size_t);
     Vector(const Vector&);
     Vector(const std::vector<double>&);
     ~Vector();
 
-    double& at(const Coordinate&) override final;
-    double at(const Coordinate&) const override final;
+    size_t get_rows() const;
+    double* get_data() const;
+    double& at(size_t);
+    double at(size_t) const;
 
+    Vector& operator=(const Vector&);
 };
 
 class Spline{
@@ -94,15 +100,15 @@ class TridiagMatrix : public Matrix{
 };
 
 class LinSystem{
-    Matrix* A;
-    Vector* b;
-    Vector* x;
+    Matrix A;
+    Vector b;
+    Vector x;
     void solve_GJ();
     void solve_LU();
     void solve_QR();
     public:
     LinSystem();
-    LinSystem(Matrix*, Vector*);
+    LinSystem(const Matrix&, const Vector&);
     virtual ~LinSystem();
-    Vector* get_solution(const std::string&);
+    Vector get_solution(const std::string&);
 };
