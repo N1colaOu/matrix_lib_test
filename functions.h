@@ -16,3 +16,6 @@ Matrix transpon(const Matrix&);
 std::ostream& operator<<(std::ostream&, const Spline&);
 std::ostream& operator<<(std::ostream&, const Matrix&);
 std::ostream& operator<<(std::ostream&, const Vector&);
+
+Matrix MatMatMult(const Matrix&, const Matrix&);
+Vector MatVecMult(const Matrix&, const Matrix&);

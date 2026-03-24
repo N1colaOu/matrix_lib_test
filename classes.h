@@ -87,11 +87,15 @@ class Spline{
     double get_x() const;
 };
 
-class SymMatrix : public Matrix{
+class LowDiagMatrix : public Matrix{
 
 };
 
-class DiagMatrix : public SymMatrix{
+class UppDiagMatrix : public Matrix{
+
+};
+
+class DiagMatrix : public Matrix{
 
 };
 
@@ -100,15 +104,37 @@ class TridiagMatrix : public Matrix{
 };
 
 class LinSystem{
+    //void solve_GJ();
+    //void solve_LU();
+    //void solve_QR();
+    public:
+    //LinSystem();
+    //LinSystem(const Matrix&, const Vector&);
+    virtual ~LinSystem() = default;
+    //Vector get_solution(const std::string&);
+    virtual Vector solve() = 0;
+};
+class GJLinSystem : public LinSystem{
     Matrix A;
     Vector b;
-    Vector x;
-    void solve_GJ();
-    void solve_LU();
-    void solve_QR();
     public:
-    LinSystem();
-    LinSystem(const Matrix&, const Vector&);
-    virtual ~LinSystem();
-    Vector get_solution(const std::string&);
+    GJLinSystem();
+    GJLinSystem(const Matrix&, const Vector&);
+    ~GJLinSystem();
+    Vector solve();
+};
+class LULinSystem : public LinSystem{
+    Matrix A;
+    Matrix L;
+    Matrix U;
+    Vector y;
+    Vector b;
+    public:
+    LULinSystem();
+    LULinSystem(const Matrix&, const Vector&);
+    ~LULinSystem();
+    Vector solve();
+};
+class QRLinSystem : public LinSystem{
+    //wip
 };

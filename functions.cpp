@@ -138,3 +138,28 @@ std::ostream& operator<<(std::ostream& out, const Matrix& m){
 //     }
 //     return inv_m_ptr;
 // }
+
+
+Matrix MatMatMult(const Matrix& A, const Matrix& B){
+    Matrix C (A.get_rows(), B.get_cols());
+    size_t n = A.get_rows();
+    size_t m = A.get_cols();
+    assert(m == B.get_rows());
+    size_t t = B.get_cols();
+    for (size_t i = 0; i < n; i++)
+    {
+        for (size_t j = 0; j < t; j++)
+        {
+            double sum{};
+            for (size_t k = 0; k < m; k++)
+            {
+                sum += A.at({i, k})*B.at({k, j});
+            }
+            C.at({i, j}) = sum; 
+        }
+    }
+    return C;
+}
+Vector MatVecMult(const Matrix& A, const Matrix& v){
+
+}

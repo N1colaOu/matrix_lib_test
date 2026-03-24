@@ -14,9 +14,13 @@ int main(){
     Vector b("input_v.txt");
     std::cout << "\nYour vector: \n" << b << '\n';
     // b->print();
-    LinSystem lin_sys(A, b);
-    Vector x (lin_sys.get_solution("gauss_jordan"));
-    std::cout << x << '\n';
+    // LinSystem lin_sys(A, b);
+    // Vector x (lin_sys.get_solution("gauss_jordan"));
+    // std::cout << x << '\n';
+    LinSystem* lin_sys = new LULinSystem(A, b);
+    // Vector x (lin_sys.get_solution("gauss_jordan"));
+    //lin_sys->solve();
+    delete lin_sys;
     
     //std::cout << "The determinant: " << det(A) << '\n';
     //std::cout << "Solved matrix: \n";
