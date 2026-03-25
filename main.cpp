@@ -7,12 +7,12 @@
 #include <vector>
 
 int main(){
-    std::cout << std::endl << '\n';
+    std::cout << "\n";
     Matrix A("input_m.txt");
-    std::cout << "\nYour matrix: \n" << A << "\n";
+    std::cout << "Your matrix: \n" << A;
     // A->print();
     Vector b("input_v.txt");
-    std::cout << "\nYour vector: \n" << b << '\n';
+    std::cout << "Your vector: \n" << b;
     // b->print();
     // LinSystem lin_sys(A, b);
     // Vector x (lin_sys.get_solution("gauss_jordan"));

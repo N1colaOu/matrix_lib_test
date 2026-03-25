@@ -127,7 +127,8 @@ class LULinSystem : public LinSystem{
     Matrix A;
     Matrix L;
     Matrix U;
-    Vector y;
+    Matrix P; //permutation to reverse the pivoting 
+    //Vector y;
     Vector b;
     public:
     LULinSystem();

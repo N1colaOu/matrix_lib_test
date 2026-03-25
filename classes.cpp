@@ -217,8 +217,8 @@ namespace{
         for (size_t i = curr_col; i < m.get_rows(); i++)
         {
             if(m.at({i, curr_col}) != 0){
-                if(max_el < std::abs(m.at({i, curr_col}))){
-                    max_el = m.at({i, curr_col});
+                if(max_el <= std::abs(m.at({i, curr_col}))){
+                    max_el = std::abs(m.at({i, curr_col}));
                     max_idx = i;
                 }
             }
@@ -235,70 +235,6 @@ namespace{
     } 
 }
 }
-
-// void LinSystem::solve_GJ(){
-//     assert(A.isSquare());
-//     assert(A.get_data() != nullptr);
-//     size_t n = A.get_cols();
-
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         double coef;
-//         if(A.at({i, i}) == 0.0){
-//             size_t pivotPoint = findPivot(A, i);//find the row to pivot with
-//             if(pivotPoint >= n){
-//                 std::cout << "No singular defined solution!\n";//if it doesnt exist -> no sol
-//                 assert(false);
-//             }
-//             switchRows(A, i, pivotPoint);
-//         }
-//         coef = A.at({i, i});
-//         A.at({i, i}) = 1.0;
-//         for (size_t j = i+1; j < n; j++)
-//         {
-//             A.at({i, j}) /= coef; //normalize the row
-//         }
-//         b.at(i) /= coef; 
-        
-//         for (size_t j = 0; j < n; j++)
-//         {
-//             if(j==i) continue;
-//             coef = A.at({j, i});
-//             if(coef == 0.0) continue;
-//             for (size_t k = 0; k < n; k++)//can be sped up
-//             {
-//                 A.at({j, k}) -= A.at({i, k})*coef; //nullify the coresponding element and decrement the row    
-//             } 
-//             b.at(j) -= b.at(i)*coef;
-//         }   
-//     } 
-//     x = b;
-// }
-// void LinSystem::solve_LU(){
-//     Matrix L;
-//     Matrix U;
-// }
-// void LinSystem::solve_QR(){
-
-// }
-// LinSystem::LinSystem() : A(), b(), x(){}
-// LinSystem::LinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b), x(){}
-// LinSystem::~LinSystem(){}
-// Vector LinSystem::get_solution(const std::string& method){
-//     if(method == "gauss_jordan"){
-//         solve_GJ();
-//     }
-//     else if(method == "lu_decomp"){
-//         solve_LU(); //wip
-//     }
-//     else if(method == "qr_decomp"){
-//         solve_QR(); //wip
-//     }
-//     else{
-//         std::cout << "Invalid Method Name\n";
-//     }    
-//     return x;
-// }
 
 GJLinSystem::GJLinSystem() = default;
 GJLinSystem::GJLinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){}
@@ -345,9 +281,31 @@ Vector GJLinSystem::solve(){
 LULinSystem::LULinSystem() = default;
 LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
     assert(A.isSquare());
+    assert(!isSingular(A));
     size_t n = A.get_cols();
     L = Matrix(n, n);
     U = Matrix(n, n);
+    P = Matrix(n, n); //permutation matrix
+    for (size_t i = 0; i < n; i++)
+    {
+        for (size_t j = 0; j <  n; j++)
+        {
+            if(i == j)  P.at({i, j}) = 1.0;
+            else P.at({i, j}) = 0.0;
+        }
+    }
+    
+    for (size_t i = 0; i < n; i++) //we pivot the whole matrix A so that the diag elements are the largest in the respective column
+    {
+        if(A.at({i, i}) < 1e-9){
+            size_t to_swap = findPivot(A, i);
+            if(to_swap < n){
+                switchRows(A, i, to_swap);
+                switchRows(P, i, to_swap);
+            }
+        }
+    }
+    
     for (size_t i = 0; i < n; i++)//this for loop sets all the start known values and the3 rest are zeroes
     {
         for (size_t j = 0; j < n; j++)
@@ -362,7 +320,6 @@ LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
         L.at({i, i}) = 1.0;
         L.at({i, 0}) = A.at({i, 0}) / U.at({0, 0});
     } 
-
     for (int i = 1; i < n; i++)
     {
         for (int j = 0; j < i; j++)//for L
@@ -384,7 +341,8 @@ LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
             U.at({i, j}) = A.at({i, j}) - sum;
         }
     }
-    std::cout << "Upper:\n" << U << "Lower:\n" << L << "A(product):\n" << MatMatMult(L, U);
+    std::cout << "Upper:\n" << U << "Lower:\n" << L << "A (unordered):\n" << MatMatMult(L, U) << "P: \n" << P <<
+     "A (ordered):\n" << MatMatMult(P,MatMatMult(L, U));
 }
 LULinSystem::~LULinSystem() = default;
 Vector LULinSystem::solve(){
