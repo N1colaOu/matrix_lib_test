@@ -35,6 +35,7 @@ Matrix::Matrix(size_t r, size_t c) : num_rows(r), num_cols(c), data(new double[r
 }
 
 Matrix::Matrix(const Matrix &m) : num_rows(m.get_rows()), num_cols(m.get_cols()){
+    assert(m.get_data());
     data = new double[num_cols*num_rows];
     for (size_t i = 0; i < num_cols*num_rows; i++)
     {
@@ -180,7 +181,7 @@ Vector::Vector(const std::string& filename){
 }
 Vector::Vector(size_t r) : rows(r), data(new double[r]){}
 Vector::Vector(const Vector& vctr) : rows(vctr.get_rows()){
-    if(vctr.get_data() !=  nullptr)
+    assert(vctr.get_data());
     data = new double[rows];
     for (size_t i = 0; i < rows; i++)
     {
@@ -348,13 +349,13 @@ Vector LULinSystem::solve(){
     size_t n = U.get_cols();
     Vector y(n), b_scrambled(MatVecMult(P, b));
 
-    y.at(0) = b_scrambled.at(0);
+    //y.at(0) = b_scrambled.at(0);
     for (size_t i = 1; i < n; i++)
     {
         double sum{};
         for (size_t j = 0; j < i; j++)
         {
-            sum += b_scrambled.at(j-1)*L.at({j, j-1});
+            sum += b_scrambled.at(j)*L.at({i, j});
         } 
         b_scrambled.at(i) -= sum; 
     }
@@ -366,9 +367,9 @@ Vector LULinSystem::solve(){
     for (int i = n-1; i >=0; i--)
     {
         double sum{};
-        for (int j = n-1; j > i ; j--)
+        for (int j = n-2; j >= i ; j--)
         {
-            sum += y.at(j)*U.at({j-1, j});
+            sum += y.at(j+1)*U.at({i, j+1});
         }
         y.at(i) -= sum;
         y.at(i) /= U.at({i, i});

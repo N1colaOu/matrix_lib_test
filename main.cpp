@@ -17,10 +17,11 @@ int main(){
     // LinSystem lin_sys(A, b);
     // Vector x (lin_sys.get_solution("gauss_jordan"));
     // std::cout << x << '\n';
-    LinSystem* lin_sys_gj = new LULinSystem(A, b);
-    LinSystem* lin_sys_lu = new GJLinSystem(A, b);
+    LinSystem* lin_sys_gj = new GJLinSystem(A, b);
+    LinSystem* lin_sys_lu = new LULinSystem(A, b);
 
-    Vector x_gj(lin_sys_gj->solve()), x_lu(lin_sys_lu->solve());
+    Vector x_gj, x_lu(lin_sys_lu->solve());
+    x_gj = lin_sys_gj->solve();
     std::cout << "GJ:\n" << x_gj << "LU: \n" << x_lu;
     std::cout << "GJ_test:\n" << MatVecMult(A, x_gj) << "LU_test:\n" << MatVecMult(A, x_lu);
     delete lin_sys_gj, lin_sys_lu;
