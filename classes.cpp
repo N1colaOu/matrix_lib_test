@@ -349,7 +349,6 @@ Vector LULinSystem::solve(){
     size_t n = U.get_cols();
     Vector y(n), b_scrambled(MatVecMult(P, b));
 
-    //y.at(0) = b_scrambled.at(0);
     for (size_t i = 1; i < n; i++)
     {
         double sum{};
@@ -360,10 +359,6 @@ Vector LULinSystem::solve(){
         b_scrambled.at(i) -= sum; 
     }
     y = b_scrambled;
-    // for (size_t i = 0; i < n; i++)//normalize diagonal
-    // {
-    //     y.at(i) /= U.at({i, i});
-    // }
     for (int i = n-1; i >=0; i--)
     {
         double sum{};
@@ -374,6 +369,5 @@ Vector LULinSystem::solve(){
         y.at(i) -= sum;
         y.at(i) /= U.at({i, i});
     }
-    //y = MatVecMult(P, y);
     return y; 
 }
