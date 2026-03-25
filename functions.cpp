@@ -77,68 +77,27 @@ std::ostream& operator<<(std::ostream& out, const Matrix& m){
     }
     return out;
 }
-
-// Matrix* gj_triangle(Matrix& m){
-//     assert(m.get_cols() >= m.get_rows()); //if false, then matrix is overdefined and should run with only a trimmed version (aka less equs)
-//     assert(m.get_data() != nullptr);
-//     for (size_t i = 0; i < m.get_rows(); i++)
-//     {
-//         double coef;
-//         if(m.at({i, i}) == 0.0){
-//             size_t pivotPoint = findPivot(m, i);//find the row to pivot with
-//             if(pivotPoint >= m.get_rows()){
-//                 std::cout << "Singular matrix!\n";//if it doesnt exist -> no sol
-//                 assert(false);
-//             }
-//             switchRows(m, i, pivotPoint);
-//         }
-//         coef = m.at({i, i});
-//         m.at({i, i}) = 1.0;
-//         for (size_t j = i+1; j < m.get_cols(); j++)
-//         {
-//             m.at({i, j}) = m.at({i, j}) / coef; //normalize the row
-//         }
-//         for (size_t j = 0; j < m.get_rows(); j++)
-//         {
-//             if(j==i) continue;
-//             coef = m.at({j, i});
-//             if(coef == 0.0) continue;
-//             for (size_t k = 0; k < m.get_cols(); k++)
-//             {
-//                 m.at({j, k}) -= m.at({i, k})*coef; //nullify the coresponding element and decrement the row    
-//             }  
-//         }   
-//     }  
-//     return &m; 
-// }
-
-// Matrix* inv(Matrix& m){
-//     assert(m.isSquare());
-//     size_t n = m.get_cols();
-//     std::vector<double> col{};
-//     col.reserve(n);
-//     for (size_t k = 0; k < n; k++)
-//     {
-//         for (size_t i = 0; i < n; i++)
-//         {
-//             if(i == k){
-//                 col.push_back(1);
-//             }
-//             else{
-//                 col.push_back(0);
-//             }
-//         }
-//         m.add_col(col);//we add the respective column to perform the gj method on
-//         col.clear();
-//     }
-//     Matrix* inv_m_ptr = gj_triangle(m);
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         inv_m_ptr->rem_col(0);//remove the extra columns
-//     }
-//     return inv_m_ptr;
-// }
-
+bool operator==(const Matrix& m1, const Matrix& m2){
+    if(m1.get_cols() != m2.get_cols() || m1.get_rows() != m2.get_rows()) return false;
+    size_t n = m1.get_cols();
+    for (size_t i = 0; i < n; i++)
+    {
+        for (size_t j = 0; j < n; j++)
+        {
+            if(m1.at({i, j}) - m2.at({i, j}) > 1e-9) return false; //check if they are equal or at least practically euqal
+        }
+    }
+    return true;
+}
+bool operator==(const Vector& v1, const Vector& v2){
+    if(v1.get_rows() != v2.get_rows()) return false;
+    size_t n = v1.get_rows();
+    for (size_t i = 0; i < n; i++)
+    {
+        if(v1.at(i) - v2.at(i) > 1e-9) return false; //check if they are equal or at least practically euqal
+    }
+    return true;
+}
 
 Matrix MatMatMult(const Matrix& A, const Matrix& B){
     Matrix C (A.get_rows(), B.get_cols());
@@ -160,6 +119,18 @@ Matrix MatMatMult(const Matrix& A, const Matrix& B){
     }
     return C;
 }
-Vector MatVecMult(const Matrix& A, const Matrix& v){
-
+Vector MatVecMult(const Matrix& A, const Vector& v){
+    size_t n = A.get_cols();
+    assert(n == v.get_rows());
+    Vector u(n);
+    for (size_t i = 0; i < n; i++)
+    {
+        double sum{};
+        for (size_t j = 0; j < n; j++)
+        {
+            sum += A.at({i, j})*v.at(j);
+        }
+        u.at(i) = sum;
+    }
+    return u;
 }

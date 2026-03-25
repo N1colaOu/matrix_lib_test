@@ -247,7 +247,7 @@ Vector GJLinSystem::solve(){
     for (size_t i = 0; i < n; i++)
     {
         double coef;
-        if(A.at({i, i}) == 0.0){
+        if(A.at({i, i}) < 1e-9){
             size_t pivotPoint = findPivot(A, i);//find the row to pivot with
             if(pivotPoint >= n){
                 std::cout << "No singular defined solution!\n";//if it doesnt exist -> no sol
@@ -262,7 +262,6 @@ Vector GJLinSystem::solve(){
             A.at({i, j}) /= coef; //normalize the row
         }
         b.at(i) /= coef; 
-        
         for (size_t j = 0; j < n; j++)
         {
             if(j==i) continue;
@@ -295,7 +294,7 @@ LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
         }
     }
     
-    for (size_t i = 0; i < n; i++) //we pivot the whole matrix A so that the diag elements are the largest in the respective column
+    for (size_t i = 0; i < n; i++) //we pivot the whole matrix A so that the diag elements are not 0 or near 0
     {
         if(A.at({i, i}) < 1e-9){
             size_t to_swap = findPivot(A, i);
@@ -320,31 +319,60 @@ LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
         L.at({i, i}) = 1.0;
         L.at({i, 0}) = A.at({i, 0}) / U.at({0, 0});
     } 
-    for (int i = 1; i < n; i++)
+    for (size_t i = 1; i < n; i++)
     {
-        for (int j = 0; j < i; j++)//for L
+        for (size_t j = 0; j < i; j++)//for L
         {
             double sum{};
-            for (int k = 0; k < j; k++)
+            for (size_t k = 0; k < j; k++)
             {
                 sum += L.at({i, k}) * U.at({k, j});
             }
             L.at({i, j}) = (A.at({i, j}) - sum) / U.at({j, j});
         }
-        for (int j = i; j < n; j++)//for U
+        for (size_t j = i; j < n; j++)//for U
         {
             double sum{};
-            for (int k = 0; k < i; k++)
+            for (size_t k = 0; k < i; k++)
             {
                 sum += L.at({i, k}) * U.at({k, j});
             }
             U.at({i, j}) = A.at({i, j}) - sum;
         }
     }
-    std::cout << "Upper:\n" << U << "Lower:\n" << L << "A (unordered):\n" << MatMatMult(L, U) << "P: \n" << P <<
-     "A (ordered):\n" << MatMatMult(P,MatMatMult(L, U));
+    Matrix A_check = MatMatMult(P, MatMatMult(L, U));
+    assert(_A == A_check); //we check if the factorization and pivoting when multipled lead to the start matrix
 }
 LULinSystem::~LULinSystem() = default;
 Vector LULinSystem::solve(){
-    return 0;
+    size_t n = U.get_cols();
+    Vector y(n), b_scrambled(MatVecMult(P, b));
+
+    y.at(0) = b_scrambled.at(0);
+    for (size_t i = 1; i < n; i++)
+    {
+        double sum{};
+        for (size_t j = 0; j < i; j++)
+        {
+            sum += b_scrambled.at(j-1)*L.at({j, j-1});
+        } 
+        b_scrambled.at(i) -= sum; 
+    }
+    y = b_scrambled;
+    // for (size_t i = 0; i < n; i++)//normalize diagonal
+    // {
+    //     y.at(i) /= U.at({i, i});
+    // }
+    for (int i = n-1; i >=0; i--)
+    {
+        double sum{};
+        for (int j = n-1; j > i ; j--)
+        {
+            sum += y.at(j)*U.at({j-1, j});
+        }
+        y.at(i) -= sum;
+        y.at(i) /= U.at({i, i});
+    }
+    //y = MatVecMult(P, y);
+    return y; 
 }

@@ -17,10 +17,13 @@ int main(){
     // LinSystem lin_sys(A, b);
     // Vector x (lin_sys.get_solution("gauss_jordan"));
     // std::cout << x << '\n';
-    LinSystem* lin_sys = new LULinSystem(A, b);
-    // Vector x (lin_sys.get_solution("gauss_jordan"));
-    //lin_sys->solve();
-    delete lin_sys;
+    LinSystem* lin_sys_gj = new LULinSystem(A, b);
+    LinSystem* lin_sys_lu = new GJLinSystem(A, b);
+
+    Vector x_gj(lin_sys_gj->solve()), x_lu(lin_sys_lu->solve());
+    std::cout << "GJ:\n" << x_gj << "LU: \n" << x_lu;
+    std::cout << "GJ_test:\n" << MatVecMult(A, x_gj) << "LU_test:\n" << MatVecMult(A, x_lu);
+    delete lin_sys_gj, lin_sys_lu;
     
     //std::cout << "The determinant: " << det(A) << '\n';
     //std::cout << "Solved matrix: \n";
