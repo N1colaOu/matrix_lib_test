@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
-#include "classes.h"
-#include "functions.h"
+#include "../lib/classes.h"
+#include "../lib/functions.h"
 #include <cmath>
 
 Coordinate::Coordinate() = default;
@@ -341,13 +341,13 @@ LULinSystem::LULinSystem(const Matrix& _A, const Vector& _b) : A(_A), b(_b){
             U.at({i, j}) = A.at({i, j}) - sum;
         }
     }
-    Matrix A_check = MatMatMult(P, MatMatMult(L, U));
+    Matrix A_check = P*L*U;
     assert(_A == A_check); //we check if the factorization and pivoting when multipled lead to the start matrix
 }
 LULinSystem::~LULinSystem() = default;
 Vector LULinSystem::solve(){
     size_t n = U.get_cols();
-    Vector y(n), b_scrambled(MatVecMult(P, b));
+    Vector y(n), b_scrambled{P*b};
 
     for (size_t i = 1; i < n; i++)
     {

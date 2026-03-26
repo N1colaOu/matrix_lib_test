@@ -1,13 +1,13 @@
 #include <vector>
 #include <cassert>
-#include "classes.h"
-#include "functions.h"
+#include "../lib/classes.h"
+#include "../lib/functions.h"
 #include <cmath>
 
 
-double neville_intrp(double x0, std::vector<double> x, std::vector<double> y){
-    size_t n = x.size();
-    assert(n == y.size());
+double neville_intrp(double x0, const Vector& x, const Vector& y){
+    size_t n = x.get_rows();
+    assert(n == y.get_rows());
     Matrix p(n, n);
     for (size_t i = 0; i < n; i++)
     {
@@ -24,20 +24,19 @@ double neville_intrp(double x0, std::vector<double> x, std::vector<double> y){
 }
 
 
-std::vector<double> lagr_plnm(std::vector<double> x, std::vector<double> y){
-    size_t n = x.size();
-    assert(n == y.size());
-    Matrix lin_sys(n, n);
+Vector lagr_plnm(const Vector& x, const Vector& y){
+    size_t n = x.get_rows();
+    assert(n == y.get_rows());
+    Matrix A(n, n);
     for (size_t i = 0; i < n; i++)
     {
         for (size_t j = 0; j < n; j++)
         {
-            lin_sys.at({i, j}) = pow(x.at(i), j);
+            A.at({i, j}) = pow(x.at(i), j);
         }
     }
-    lin_sys.add_col(y);
-    //lin_sys = *gj_triangle(lin_sys);
-    return lin_sys.get_col_val(n);
+    GJLinSystem lin_sys(A, y);
+    return lin_sys.solve();
 }
 
 

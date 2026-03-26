@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include "classes.h"
+#include "../lib/classes.h"
 
 
 double det(const Matrix& m){
@@ -99,7 +99,7 @@ bool operator==(const Vector& v1, const Vector& v2){
     return true;
 }
 
-Matrix MatMatMult(const Matrix& A, const Matrix& B){
+Matrix operator*(const Matrix& A, const Matrix& B){
     Matrix C (A.get_rows(), B.get_cols());
     size_t n = A.get_rows();
     size_t m = A.get_cols();
@@ -119,7 +119,7 @@ Matrix MatMatMult(const Matrix& A, const Matrix& B){
     }
     return C;
 }
-Vector MatVecMult(const Matrix& A, const Vector& v){
+Vector operator*(const Matrix& A, const Vector& v){
     size_t n = A.get_cols();
     assert(n == v.get_rows());
     Vector u(n);
